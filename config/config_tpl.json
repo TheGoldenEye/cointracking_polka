@@ -1,0 +1,44 @@
+{
+  "staking": "day",
+  "feeReceived": "day",
+  "feePaid": "day",
+  "defchain": "Polkadot",
+  "chains": {
+    "Polkadot": {
+      "database": "data/Polkadot.db",
+      "unit": "DOT",
+      "ticker": "DOT2",
+      "decimals": 10,
+      "accounts": [
+        { "name": "Example1", "account": "15kUt2i86LHRWCkE3D9Bg1HZAoc2smhn1fwPzDERTb1BXAkX" },
+        { "name": "Example2", "account": "12xtAYsRUrmbniiWQqJtECiBQrMn8AypQcXhnQAc6RB6XkLW" }
+      ]
+    },
+    "Kusama": {
+      "database": "data/Kusama.db",
+      "unit": "KSM",
+      "ticker": "KSM",
+      "decimals": 12,
+      "accounts": [
+        { "name": "Example1", "account": "HmFYPT1btmi1T9qqs5WtuNJK93yNdnjjhReZh6emgNQvCHa" },
+        { "name": "Example2", "account": "GXPPBuUaZYYYvsEquX55AQ1MRvgZ96kniEKyAVDSdv1SX96" }
+      ]
+    },
+    "Westend": {
+      "database": "data/Westend.db",
+      "unit": "WND",
+      "ticker": "WND",
+      "decimals": 12,
+      "accounts": [
+        { "name": "Example1", "account": "5FnD6fKjTFLDKwBvrieQ6ZthZbgMjppynLhKqiRUft9yr8Nf" },
+        { "name": "Example2", "account": "5DfdW2r2hyXzGdXFqAVJKGrtxV2UaacnVNr3sAdgCUDc9N9g" }
+      ]
+    }
+  },
+  "csv": {
+    "header":      "\"Type\",\"Buy\",\"Cur.\",\"Sell\",\"Cur.\",\"Fee\",\"Cur.\",\"Exchange\",\"Group\",\"Comment\",\"Date\",\"TradeID\",\"BuyValue\",\"SellValue\"",
+    "staking":     "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"stash: %s tx:%s\",\"%s\",\"Staking_%s_%s\"",
+    "feeReceived": "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"Fee received: tx:%s\",\"%s\",\"Staking_%s_%s\"",
+    "feePaid":     "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Staking_%s\",\"%s\",\"Fee paid: tx:%s\",\"%s\",\"Staking_%s_%s\",\"0.00000001\",\"0.00000001\""
+  }
+}

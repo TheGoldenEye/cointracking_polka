@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cointracking_polka config file schema",
+  "type": "object",
+  "definitions": {
+    "NamedAccount": {
+      "type": "object",
+      "required": [ "name", "account" ],
+      "properties": {
+        "name": { "type": "string" },
+        "account": { "type": "string" }
+      }
+    },
+    "ChainData": {
+      "type": "object",
+      "description": "Chain specific data",
+      "required": [
+        "unit",
+        "ticker",
+        "decimals",
+        "accounts"
+      ],
+      "properties": {
+        "database": {
+          "type": "string",
+          "default": "",
+          "description": "The path to the sqlite3 database, the (empty) default means, the filename is set automatically to 'data/<chainname>.db'"
+        },
+        "unit": {
+          "description": "The coin unit.",
+          "type": "string",
+          "enum": [ "DOT", "KSM", "WND" ]
+        },
+        "ticker": {
+          "description": "The cointracking symbol.",
+          "type": "string",
+          "enum": [ "DOT2", "KSM", "WND" ]
+        },
+        "decimals": {
+          "description": "The number of decimal places of the unit.",
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 12
+        },
+        "accounts": {
+          "type": "array",
+          "description": "A named account.",
+          "items": {
+            "$ref": "#/definitions/NamedAccount"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "staking",
+    "feeReceived",
+    "feePaid",
+    "defchain",
+    "chains"
+  ],
+  "properties": {
+    "staking": {
+      "description": "How to collect the staking reward records: individual, summarized with same time, summarized daily or none.",
+      "type": "string",
+          "enum": [ "individual", "time", "day", "none" ]
+    },
+    "feeReceived": {
+      "description": "How to collect the records of fees received: individual, summarized with same time, summarized daily or none.",
+      "type": "string",
+          "enum": [ "individual", "time", "day", "none" ]
+    },
+    "feePaid": {
+      "description": "How to collect records of paid fees: individual, summarized with same time, summarized daily or none.",
+      "type": "string",
+          "enum": [ "individual", "time", "day", "none" ]
+    },
+    "defchain": {
+      "type": "string",
+      "default": "Polkadot",
+      "description": "The chain which is used (if no chain is given in the command line)."
+    },
+    "chains": {
+      "type": "object",
+      "description": "The defined chains",
+      "required": [ "Polkadot", "Kusama", "Westend" ],
+      "properties": {
+        "Polkadot": {
+          "$ref": "#/definitions/ChainData"
+        },
+        "Kusama": {
+          "$ref": "#/definitions/ChainData"
+        },
+        "Westend": {
+          "$ref": "#/definitions/ChainData"
+        }
+      }
+    }
+  }
+}
