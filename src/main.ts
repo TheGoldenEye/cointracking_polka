@@ -1,5 +1,5 @@
 // Required imports
-import { Divide, DivideS, LoadConfigFile, TimeStr, EndOfPeriod } from './utils';
+import { DivideS, LoadConfigFile, TimeStr, EndOfPeriod } from './utils';
 import { sprintf } from "sprintf-js";
 import * as fs from 'fs';
 import * as getPackageVersion from '@jsbits/get-package-version';
@@ -39,6 +39,7 @@ type TFeePaidRecord = {
 }
 
 // --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CreateCsv(fs: any, header: string, timestamp: number, unit: string): string {
   const fileName = 'output/' + TimeStr(timestamp, true, false) + '_' + unit + '.csv';
 
@@ -85,6 +86,7 @@ function GetFeeReceivedRecords(name: string, accountID: string, atBlock: number)
 }
 
 // --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function OutputStaking(progressOfs: number, progressCnt: number, file: string, format: string, daily: boolean, chainData: any, arr: TStakingRecord[]): { count: number, value: bigint } {
   const decimals = chainData.decimals;
   const unit = chainData.unit;
@@ -114,6 +116,7 @@ function OutputStaking(progressOfs: number, progressCnt: number, file: string, f
 }
 
 // --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function OutputFeeReceived(progressOfs: number, progressCnt: number, file: string, format: string, daily: boolean, chainData: any, arr: TFeeReceivedRecord[]): { count: number, value: bigint } {
 
   const decimals = chainData.decimals;
@@ -144,6 +147,7 @@ function OutputFeeReceived(progressOfs: number, progressCnt: number, file: strin
 }
 
 // --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function OutputFeePaid(progressOfs: number, progressCnt: number, file: string, format: string, daily: boolean, chainData: any, arr: TFeePaidRecord[]): { count: number, value: bigint } {
 
   const decimals = chainData.decimals;
@@ -231,7 +235,7 @@ function main() {
   const formatFeePaid = config.csv.feePaid;
   const unit = chainData.unit;
 
-  console.log('Use transaction data until block: %d (%s)', atBlock, date ? date.dateStr : '?');
+  console.log('Using transaction data until block: %d (%s)', atBlock, date ? date.dateStr : '?');
 
   const file = CreateCsv(fs, config.csv.header, Number(date.timestamp), unit);
 
