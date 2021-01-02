@@ -5,7 +5,7 @@
 Staking in Polkadot is a tax-relevant process. But how do I find out what income
 I have generated?  
 Maybe you already use <https://cointracking.info>, the
-"Leader for Cryptocurrency Tracking and Tax Reporting"  
+"Leader for Cryptocurrency Tracking and Tax Reporting".  
 If you do so, you have to import your staking data in the Cointracking Service.
 
 This is where **cointracking_polka** comes into play, it generates reports on
@@ -98,7 +98,7 @@ If you want, you can download the latest versions of the transaction databases
 [here](https://e.pcloud.link/publink/show?code=kZx3eZENGTspnf6YLueJK6F2w8ULTpnFIk).  
 Alternatively you can install **polka-store** and create the transaction databases yourself.  
 
-Please copy the Polkadot.db and/or Kusama.db to your data directory.
+*Please copy the Polkadot.db and/or Kusama.db to the data directory.*
 
 ## 3 Configuration
 
