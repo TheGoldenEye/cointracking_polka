@@ -2,7 +2,14 @@
 
 ## 1 Overview
 
-Staking reward and fee reports for <https://cointracking.info>
+Staking in Polkadot is a tax-relevant process. But how do I find out what income
+I have generated?  
+Maybe you already use <https://cointracking.info>, the
+"Leader for Cryptocurrency Tracking and Tax Reporting"  
+If you do so, you have to import your staking data in the Cointracking Service.
+
+This is where **cointracking_polka** comes into play, it generates reports on
+staking income and fees for accounts to be freely defined.
 
 **cointracking_polka** is a Node.js program written in typescript to create
 staking reports usable with <https://cointracking.info>, the service which helps
@@ -14,6 +21,7 @@ The following coins are supported:
 
 * Polkadot
 * Kusama
+* Westend (testnet, therefore not relevant for cointracking)
 
 ## 2 Installation
 
@@ -69,7 +77,7 @@ sudo npm install -g yarn
 
 ### 2.2 Installing the project dependencies
 
-Please always run this when the sources have been updated from the git repository.
+*Please always run this when the sources have been updated from the git repository.*
 
 Use yarn to install the dependencies:
 
@@ -96,11 +104,11 @@ Please copy the Polkadot.db and/or Kusama.db to your data directory.
 
 ### 3.1 config/config.json
 
-Please find a template for configuration in `config/config_tpl.json`.
+You can find a template for configuration in `config/config_tpl.json`.
 Instead, the file used by the tool is `config/config.json`.
 If the file does not exist, `config/config_tpl.json` is copied to
 `config/config.json` during the program start phase.  
-You can adapt this file to your needs.
+You can adapt this file (`config.json`) to your needs.
 
 Here are the parameters defined for the different chains.  
 In the `accounts` list you can define the accounts to analyze (stash accounts
