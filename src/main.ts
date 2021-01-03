@@ -40,8 +40,8 @@ type TFeePaidRecord = {
 
 // --------------------------------------------------------------
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CreateCsv(fs: any, header: string, timestamp: number, unit: string): string {
-  const fileName = 'output/' + TimeStr(timestamp, true, false) + '_' + unit + '.csv';
+function CreateCsv(fs: any, header: string, date: string, unit: string): string {
+  const fileName = 'output/' + date + '_' + unit + '.csv';
 
   if (fs.existsSync(fileName))
     fs.unlinkSync(fileName);
@@ -52,7 +52,7 @@ function CreateCsv(fs: any, header: string, timestamp: number, unit: string): st
 }
 
 // --------------------------------------------------------------
-function GetStakingRecords(name: string, accountID: string, atBlock: number): TStakingRecord[] {
+function GetStakingRecords(name: string, accountID: string, atBlock: bigint): TStakingRecord[] {
   const res: TStakingRecord[] = db().query('SELECT ? as name, id, recipientId, addData AS stash, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                             FROM transactions WHERE event=\'staking.Reward\' AND addData=? AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
@@ -60,7 +60,7 @@ function GetStakingRecords(name: string, accountID: string, atBlock: number): TS
 }
 
 // --------------------------------------------------------------
-function GetFeePaidRecords(name: string, accountID: string, atBlock: number): TFeePaidRecord[] {
+function GetFeePaidRecords(name: string, accountID: string, atBlock: bigint): TFeePaidRecord[] {
   const res1: TFeePaidRecord[] = db().query('SELECT ? as name, id, senderId, totalFee AS feePaid, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                              FROM transactions WHERE totalFee IS NOT NULL AND senderId=? AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
@@ -78,7 +78,7 @@ function GetFeePaidRecords(name: string, accountID: string, atBlock: number): TF
 }
 
 // --------------------------------------------------------------
-function GetFeeReceivedRecords(name: string, accountID: string, atBlock: number): TFeeReceivedRecord[] {
+function GetFeeReceivedRecords(name: string, accountID: string, atBlock: bigint): TFeeReceivedRecord[] {
   const res: TFeeReceivedRecord[] = db().query('SELECT ? as name, id, authorId, feeBalances AS feeReceived, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                                 FROM transactions WHERE feeBalances IS NOT NULL AND authorId=? AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
@@ -222,10 +222,15 @@ function main() {
     return;
   }
 
-  const lastBlock = Number(db().queryFirstRow('SELECT max(height) AS val FROM transactions').val);
+  const lastBlock = Number(db().queryFirstRow('SELECT height FROM transactions ORDER BY timestamp DESC').height);
   const sBlock = process.argv[3];   // the block number was given by command line?
   const atBlock = isNaN(+sBlock) ? lastBlock : Math.min(+sBlock, lastBlock);  // not behind lastBlock
-  const date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp FROM transactions WHERE height=?', atBlock);
+  let date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp, height \
+                                 FROM transactions WHERE height<=? ORDER BY timestamp DESC', atBlock);
+  if (!date) {
+    console.log('Missing Data in Database, abort.');
+    return;
+  }
 
   const flagStaking = config.staking;
   const flagFeePaid = config.feePaid;
@@ -235,9 +240,21 @@ function main() {
   const formatFeePaid = config.csv.feePaid;
   const unit = chainData.unit;
 
-  console.log('Using transaction data until block: %d (%s)', atBlock, date ? date.dateStr : '?');
+  if (flagStaking == 'day' || flagFeePaid == 'day' || flagFeeReceived == 'day') {
+    // if aggregation by day, we need the last complete day
+    const d1 = new Date(date.dateStr);
+    const d2 = EndOfPeriod(new Date(d1.getTime() - 86400000), 'day'); // end of the day before
+    date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp, height \
+                               FROM transactions WHERE timestamp<=? ORDER BY timestamp DESC', d2.getTime());
+  }
+  if (!date) {
+    console.log('Missing Data in Database, abort.');
+    return;
+  }
 
-  const file = CreateCsv(fs, config.csv.header, Number(date.timestamp), unit);
+  console.log('Using transaction data until block: %d (%s)', Number(date.height), date.dateStr);
+
+  const file = CreateCsv(fs, config.csv.header, date.dateStr.substring(0, 10), unit);
 
   let arrStaking: TStakingRecord[] = [];
   let arrFeeReceived: TFeeReceivedRecord[] = [];
@@ -252,13 +269,13 @@ function main() {
     const name = chainData.accounts[i].name;
 
     if (flagStaking != 'none')
-      arrStaking = arrStaking.concat(GetStakingRecords(name, accountID, atBlock));
+      arrStaking = arrStaking.concat(GetStakingRecords(name, accountID, date.height));
 
     if (flagFeeReceived != 'none')
-      arrFeeReceived = arrFeeReceived.concat(GetFeeReceivedRecords(name, accountID, atBlock));
+      arrFeeReceived = arrFeeReceived.concat(GetFeeReceivedRecords(name, accountID, date.height));
 
     if (flagFeePaid != 'none')
-      arrFeePaid = arrFeePaid.concat(GetFeePaidRecords(name, accountID, atBlock));
+      arrFeePaid = arrFeePaid.concat(GetFeePaidRecords(name, accountID, date.height));
 
   }
   process.stdout.write('\r  Progress: 100%\n');
