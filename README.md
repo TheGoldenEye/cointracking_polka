@@ -34,7 +34,7 @@ These steps should only be carried out during the initial installation.
 First you have to clone the repository:
 
 ``` bash
-git clone https://github.com/TheGoldenEye/cointracking_dpos.git
+git clone https://github.com/TheGoldenEye/cointracking_polka.git
 ```
 
 #### 2.1.2 Needed packages
