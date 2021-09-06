@@ -328,6 +328,7 @@ function main() {
   const flagFeePaid = config.feePaid;
   const flagFeeReceived = config.feeReceived;
   const flagCreateTransfers = config.createTransfers || false;
+  const arrIgnoreTx: string[] = config.ignoreTx;
   const formatStaking = config.csv.staking;
   const formatFeeReceived = config.csv.feeReceived;
   const formatFeePaid = config.csv.feePaid;
@@ -384,7 +385,29 @@ function main() {
   }
   process.stdout.write('\r  Progress: 100%\n');
 
-  // 2 aggregate entries, if required
+  // 2. remove tx to ignore
+  arrStaking.forEach((value: TStakingRecord) => {
+    if (arrIgnoreTx.includes(value.id))
+      value.ignore = true;
+  });
+  arrFeeReceived.forEach((value: TFeeReceivedRecord) => {
+    if (arrIgnoreTx.includes(value.id))
+      value.ignore = true;
+  });
+  arrFeePaid.forEach((value: TFeePaidRecord) => {
+    if (arrIgnoreTx.includes(value.id))
+      value.ignore = true;
+  });
+  arrDeposits.forEach((value: TDepositRecord) => {
+    if (arrIgnoreTx.includes(value.id))
+      value.ignore = true;
+  });
+  arrWithdrawals.forEach((value: TWithdrawalRecord) => {
+    if (arrIgnoreTx.includes(value.id))
+      value.ignore = true;
+  });
+
+  // 3. aggregate entries, if required
   if (flagStaking == 'day' || flagStaking == 'time') {
     arrStaking.forEach((value: TStakingRecord, index: number, array: TStakingRecord[]) => {
       if (value.ignore) // the entry was processed already
@@ -439,7 +462,7 @@ function main() {
     });
   }
 
-  // 3. iterate over all records
+  // 4. iterate over all records
   console.log('Write csv file...');
 
   // for progress only:

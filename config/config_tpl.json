@@ -4,6 +4,7 @@
   "feePaid": "day",
   "createTransfers": false,
   "defchain": "Polkadot",
+  "ignoreTx": [],
   "chains": {
     "Polkadot": {
       "database": "data/Polkadot.db",

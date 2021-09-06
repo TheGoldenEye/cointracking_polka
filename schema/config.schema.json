@@ -59,6 +59,7 @@
     "feePaid",
     "createTransfers",
     "defchain",
+    "ignoreTx",
     "chains"
   ],
   "properties": {
@@ -86,6 +87,13 @@
       "type": "string",
       "default": "Polkadot",
       "description": "The chain which is used (if no chain is given in the command line)."
+    },
+    "ignoreTx": {
+      "type": "array",
+      "description": "Transactions to ignore",
+      "items": {
+        "type": "string"
+      }
     },
     "chains": {
       "type": "object",
