@@ -8,7 +8,8 @@
       "required": [ "name", "account" ],
       "properties": {
         "name": { "type": "string" },
-        "account": { "type": "string" }
+        "account": { "type": "string" },
+        "comment": { "type": "string" }
       }
     },
     "ChainData": {
