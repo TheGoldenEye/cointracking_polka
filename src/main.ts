@@ -222,11 +222,13 @@ function main() {
     return;
   }
 
-  const lastBlock = Number(db().queryFirstRow('SELECT height FROM transactions ORDER BY timestamp DESC').height);
+  //const lastBlock = Number(db().queryFirstRow('SELECT max(height) FROM transactions').height);
+  const maxBlock = Number.MAX_SAFE_INTEGER;
   const sBlock = process.argv[3];   // the block number was given by command line?
-  const atBlock = isNaN(+sBlock) ? lastBlock : Math.min(+sBlock, lastBlock);  // not behind lastBlock
+  const atBlock = isNaN(+sBlock) ? maxBlock : Math.min(+sBlock, maxBlock);
+  const lastBlock = Number(db().queryFirstRow('SELECT max(height) As height FROM transactions WHERE height<=?', atBlock).height); // the last block <=atBlock
   let date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp, height \
-                                 FROM transactions WHERE height<=? ORDER BY timestamp DESC', atBlock);
+                                 FROM transactions WHERE height=?', lastBlock);
   if (!date) {
     console.log('Missing Data in Database, abort.');
     return;
@@ -244,8 +246,10 @@ function main() {
     // if aggregation by day, we need the last complete day
     const d1 = new Date(date.dateStr);
     const d2 = EndOfPeriod(new Date(d1.getTime() - 86400000), 'day'); // end of the day before
-    date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp, height \
-                               FROM transactions WHERE timestamp<=? ORDER BY timestamp DESC', d2.getTime());
+
+    const h = db().queryFirstRow('SELECT max(height) as height FROM transactions WHERE timestamp<=?', d2.getTime()).height;
+
+    date = db().queryFirstRow('SELECT datetime(timestamp/1000, \'unixepoch\', \'localtime\') as dateStr, timestamp, height FROM transactions WHERE height=?', h);
   }
   if (!date) {
     console.log('Missing Data in Database, abort.');
