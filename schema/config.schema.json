@@ -57,6 +57,7 @@
     "staking",
     "feeReceived",
     "feePaid",
+    "createTransfers",
     "defchain",
     "chains"
   ],
@@ -75,6 +76,11 @@
       "description": "How to collect records of paid fees: individual, summarized with same time, summarized daily or none.",
       "type": "string",
           "enum": [ "individual", "time", "day", "none" ]
+    },
+    "createTransfers": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Create Deposit and Withdrawal transactions."
     },
     "defchain": {
       "type": "string",

@@ -39,6 +39,28 @@ type TFeePaidRecord = {
 }
 
 // --------------------------------------------------------------
+type TDepositRecord = {
+  name: string,
+  id: string,
+  senderId: string,
+  recipientId: string,
+  amount: bigint,
+  date: string,
+  ignore?: boolean;
+}
+
+// --------------------------------------------------------------
+type TWithdrawalRecord = {
+  name: string,
+  id: string,
+  senderId: string,
+  recipientId: string,
+  amount: bigint,
+  date: string,
+  ignore?: boolean;
+}
+
+// --------------------------------------------------------------
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CreateCsv(fs: any, header: string, date: string, unit: string): string {
   const fileName = 'output/' + date + '_' + unit + '.csv';
@@ -81,6 +103,22 @@ function GetFeePaidRecords(name: string, accountID: string, atBlock: bigint): TF
 function GetFeeReceivedRecords(name: string, accountID: string, atBlock: bigint): TFeeReceivedRecord[] {
   const res: TFeeReceivedRecord[] = db().query('SELECT ? as name, id, authorId, feeBalances AS feeReceived, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                                 FROM transactions WHERE feeBalances IS NOT NULL AND authorId=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, atBlock);
+  return res;
+}
+
+// --------------------------------------------------------------
+function GetDepositRecords(name: string, accountID: string, atBlock: bigint): TDepositRecord[] {
+  const res: TDepositRecord[] = db().query('SELECT ? as name, id, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
+                                             FROM transactions WHERE senderId IS NOT NULL AND recipientId=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, atBlock);
+  return res;
+}
+
+// --------------------------------------------------------------
+function GetWithdrawalRecords(name: string, accountID: string, atBlock: bigint): TWithdrawalRecord[] {
+  const res: TWithdrawalRecord[] = db().query('SELECT ? as name, id, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
+                                                FROM transactions WHERE senderId=? AND recipientId IS NOT NULL AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
   return res;
 }
@@ -178,6 +216,58 @@ function OutputFeePaid(progressOfs: number, progressCnt: number, file: string, f
 }
 
 // --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function OutputDeposits(progressOfs: number, progressCnt: number, file: string, format: string, chainData: any, arr: TDepositRecord[]): number {
+
+  const decimals = chainData.decimals;
+  const unit = chainData.unit;
+  const ticker = chainData.ticker;
+
+  let count = 0;
+
+  arr.forEach((e, idx) => {
+    process.stdout.write(sprintf('\r  Progress: %d%%  ', progressOfs + (progressCnt * idx / arr.length)));
+
+    if (e.ignore)
+      return;
+
+    count++;
+
+    const val = DivideS(e.amount, decimals);
+    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_D\"",
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, e.date, unit, e.id));
+  });
+
+  return count;
+}
+
+// --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function OutputWithdrawals(progressOfs: number, progressCnt: number, file: string, format: string, chainData: any, arr: TWithdrawalRecord[]): number {
+
+  const decimals = chainData.decimals;
+  const unit = chainData.unit;
+  const ticker = chainData.ticker;
+
+  let count = 0;
+
+  arr.forEach((e, idx) => {
+    process.stdout.write(sprintf('\r  Progress: %d%%  ', progressOfs + (progressCnt * idx / arr.length)));
+
+    if (e.ignore)
+      return;
+
+    count++;
+
+    const val = DivideS(e.amount, decimals);
+    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_W\""
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, e.date, unit, e.id));
+  });
+
+  return count;
+}
+
+// --------------------------------------------------------------
 // --------------------------------------------------------------
 function main() {
   // command line parameters:
@@ -237,9 +327,12 @@ function main() {
   const flagStaking = config.staking;
   const flagFeePaid = config.feePaid;
   const flagFeeReceived = config.feeReceived;
+  const flagCreateTransfers = config.createTransfers || false;
   const formatStaking = config.csv.staking;
   const formatFeeReceived = config.csv.feeReceived;
   const formatFeePaid = config.csv.feePaid;
+  const formatDeposit = config.csv.deposit;
+  const formatWithdrawal = config.csv.withdrawal;
   const unit = chainData.unit;
 
   if (flagStaking == 'day' || flagFeePaid == 'day' || flagFeeReceived == 'day') {
@@ -263,6 +356,8 @@ function main() {
   let arrStaking: TStakingRecord[] = [];
   let arrFeeReceived: TFeeReceivedRecord[] = [];
   let arrFeePaid: TFeePaidRecord[] = [];
+  let arrDeposits: TDepositRecord[] = [];
+  let arrWithdrawals: TWithdrawalRecord[] = [];
 
   // 1. iterate over all accounts and collect all data records
   console.log('Query data from database...');
@@ -280,6 +375,11 @@ function main() {
 
     if (flagFeePaid != 'none')
       arrFeePaid = arrFeePaid.concat(GetFeePaidRecords(name, accountID, date.height));
+
+    if (flagCreateTransfers) {
+      arrDeposits = arrDeposits.concat(GetDepositRecords(name, accountID, date.height));
+      arrWithdrawals = arrWithdrawals.concat(GetWithdrawalRecords(name, accountID, date.height));
+    }
 
   }
   process.stdout.write('\r  Progress: 100%\n');
@@ -343,19 +443,25 @@ function main() {
   console.log('Write csv file...');
 
   // for progress only:
-  const total = arrStaking.length + arrFeeReceived.length + arrFeePaid.length;
+  const total = arrStaking.length + arrFeeReceived.length + arrFeePaid.length + arrDeposits.length + arrWithdrawals.length;
   const cnt1 = 100.0 * arrStaking.length / total;
   const cnt2 = 100.0 * arrFeeReceived.length / total;
   const cnt3 = 100.0 * arrFeePaid.length / total;
+  const cnt4 = 100.0 * arrDeposits.length / total;
+  const cnt5 = 100.0 * arrWithdrawals.length / total;
 
   const staking = OutputStaking(0, cnt1, file, formatStaking, flagStaking == 'day', chainData, arrStaking);
   const feeReceived = OutputFeeReceived(cnt1, cnt2, file, formatFeeReceived, flagFeeReceived == 'day', chainData, arrFeeReceived);
   const feePaid = OutputFeePaid(cnt1 + cnt2, cnt3, file, formatFeePaid, flagFeePaid == 'day', chainData, arrFeePaid);
+  const deposits = OutputDeposits(cnt1 + cnt2 + cnt3, cnt4, file, formatDeposit, chainData, arrDeposits);
+  const withdrawals = OutputWithdrawals(cnt1 + cnt2 + cnt3 + cnt4, cnt5, file, formatWithdrawal, chainData, arrWithdrawals);
 
   process.stdout.write('\r  Progress: 100%\n\n');
   console.log(sprintf('Staking records:     %5d   Total: %s %s', staking.count, DivideS(staking.value, chainData.decimals), unit));
   console.log(sprintf('FeeReceived records: %5d   Total: %s %s', feeReceived.count, DivideS(feeReceived.value, chainData.decimals), unit));
   console.log(sprintf('FeePaid records:     %5d   Total: %s %s', feePaid.count, DivideS(-feePaid.value, chainData.decimals), unit));
+  console.log(sprintf('Deposit records:     %5d', deposits));
+  console.log(sprintf('Withdrawal records:  %5d', withdrawals));
 }
 
 main();
