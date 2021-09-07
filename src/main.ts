@@ -444,13 +444,13 @@ function main() {
     });
   }
 
-  if (flagFeeReceived == 'day' || flagFeePaid == 'time') {
+  if (flagFeePaid == 'day' || flagFeePaid == 'time') {
     arrFeePaid.forEach((value: TFeePaidRecord, index: number, array: TFeePaidRecord[]) => {
       if (value.ignore) // the entry was processed already
         return;
 
       const d1 = new Date(value.date);
-      const d2 = EndOfPeriod(d1, flagFeeReceived);
+      const d2 = EndOfPeriod(d1, flagFeePaid);
       let i: number;
       for (i = index + 1; i < array.length && array[i].senderId == value.senderId; i++) {
         const d = new Date(array[i].date);
