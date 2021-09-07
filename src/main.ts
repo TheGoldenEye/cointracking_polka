@@ -329,6 +329,7 @@ function main() {
   const flagFeeReceived = config.feeReceived;
   const flagCreateTransfers = config.createTransfers || false;
   const arrIgnoreTx: string[] = config.ignoreTx;
+  const arrIgnoreTxDW: string[] = config.ignoreTxDW;
   const formatStaking = config.csv.staking;
   const formatFeeReceived = config.csv.feeReceived;
   const formatFeePaid = config.csv.feePaid;
@@ -399,11 +400,11 @@ function main() {
       value.ignore = true;
   });
   arrDeposits.forEach((value: TDepositRecord) => {
-    if (arrIgnoreTx.includes(value.id))
+    if (arrIgnoreTx.includes(value.id) || arrIgnoreTxDW.includes(value.id))
       value.ignore = true;
   });
   arrWithdrawals.forEach((value: TWithdrawalRecord) => {
-    if (arrIgnoreTx.includes(value.id))
+    if (arrIgnoreTx.includes(value.id) || arrIgnoreTxDW.includes(value.id))
       value.ignore = true;
   });
 

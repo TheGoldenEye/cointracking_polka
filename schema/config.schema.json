@@ -5,11 +5,20 @@
   "definitions": {
     "NamedAccount": {
       "type": "object",
-      "required": [ "name", "account" ],
+      "required": [
+        "name",
+        "account"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "account": { "type": "string" },
-        "comment": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "account": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
       }
     },
     "ChainData": {
@@ -30,12 +39,20 @@
         "unit": {
           "description": "The coin unit.",
           "type": "string",
-          "enum": [ "DOT", "KSM", "WND" ]
+          "enum": [
+            "DOT",
+            "KSM",
+            "WND"
+          ]
         },
         "ticker": {
           "description": "The cointracking symbol.",
           "type": "string",
-          "enum": [ "DOT2", "KSM", "WND" ]
+          "enum": [
+            "DOT2",
+            "KSM",
+            "WND"
+          ]
         },
         "decimals": {
           "description": "The number of decimal places of the unit.",
@@ -60,23 +77,39 @@
     "createTransfers",
     "defchain",
     "ignoreTx",
+    "ignoreTxDW",
     "chains"
   ],
   "properties": {
     "staking": {
       "description": "How to collect the staking reward records: individual, summarized with same time, summarized daily or none.",
       "type": "string",
-          "enum": [ "individual", "time", "day", "none" ]
+      "enum": [
+        "individual",
+        "time",
+        "day",
+        "none"
+      ]
     },
     "feeReceived": {
       "description": "How to collect the records of fees received: individual, summarized with same time, summarized daily or none.",
       "type": "string",
-          "enum": [ "individual", "time", "day", "none" ]
+      "enum": [
+        "individual",
+        "time",
+        "day",
+        "none"
+      ]
     },
     "feePaid": {
       "description": "How to collect records of paid fees: individual, summarized with same time, summarized daily or none.",
       "type": "string",
-          "enum": [ "individual", "time", "day", "none" ]
+      "enum": [
+        "individual",
+        "time",
+        "day",
+        "none"
+      ]
     },
     "createTransfers": {
       "type": "boolean",
@@ -90,7 +123,14 @@
     },
     "ignoreTx": {
       "type": "array",
-      "description": "Transactions to ignore",
+      "description": "Transactions to ignore (all types)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ignoreTxDW": {
+      "type": "array",
+      "description": "Transactions to ignore (Deposit/Withdrawal only)",
       "items": {
         "type": "string"
       }
@@ -98,7 +138,11 @@
     "chains": {
       "type": "object",
       "description": "The defined chains",
-      "required": [ "Polkadot", "Kusama", "Westend" ],
+      "required": [
+        "Polkadot",
+        "Kusama",
+        "Westend"
+      ],
       "properties": {
         "Polkadot": {
           "$ref": "#/definitions/ChainData"

@@ -5,6 +5,7 @@
   "createTransfers": false,
   "defchain": "Polkadot",
   "ignoreTx": [],
+  "ignoreTxDW": [],
   "chains": {
     "Polkadot": {
       "database": "data/Polkadot.db",
