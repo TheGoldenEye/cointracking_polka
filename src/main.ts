@@ -408,6 +408,7 @@ function main() {
   });
 
   // 3. aggregate entries, if required
+  // 3.1 staking entries
   if (flagStaking == 'day' || flagStaking == 'time') {
     arrStaking.forEach((value: TStakingRecord, index: number, array: TStakingRecord[]) => {
       if (value.ignore) // the entry was processed already
@@ -421,11 +422,13 @@ function main() {
         if (d > d2)
           break;
         value.amount += array[i].amount;
+        value.id += ' ' + array[i].id;
         array[i].ignore = true;
       }
     });
   }
 
+  // 3.2 feeReceived entries
   if (flagFeeReceived == 'day' || flagFeeReceived == 'time') {
     arrFeeReceived.forEach((value: TFeeReceivedRecord, index: number, array: TFeeReceivedRecord[]) => {
       if (value.ignore) // the entry was processed already
@@ -439,11 +442,13 @@ function main() {
         if (d > d2)
           break;
         value.feeReceived += array[i].feeReceived;
+        value.id += ' ' + array[i].id;
         array[i].ignore = true;
       }
     });
   }
 
+  // 3.3 feePaid entries
   if (flagFeePaid == 'day' || flagFeePaid == 'time') {
     arrFeePaid.forEach((value: TFeePaidRecord, index: number, array: TFeePaidRecord[]) => {
       if (value.ignore) // the entry was processed already
@@ -457,6 +462,7 @@ function main() {
         if (d > d2)
           break;
         value.feePaid += array[i].feePaid;
+        value.id += ' ' + array[i].id;
         array[i].ignore = true;
       }
     });
