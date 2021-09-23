@@ -443,7 +443,9 @@ function main() {
         if (d > d2)
           break;
         value.feeReceived += array[i].feeReceived;
-        value.id += ' ' + array[i].id;
+        if (value.id.indexOf('...') < 0) // block fees can be many (from authored blocks)
+          value.id += ' ...';
+        // value.id += ' ' + array[i].id;
         array[i].ignore = true;
       }
     });
