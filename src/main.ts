@@ -76,7 +76,7 @@ function CreateCsv(fs: any, header: string, date: string, unit: string): string 
 // --------------------------------------------------------------
 function GetStakingRecords(name: string, accountID: string, atBlock: bigint): TStakingRecord[] {
   const res: TStakingRecord[] = db().query('SELECT ? as name, id, recipientId, addData AS stash, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                            FROM transactions WHERE event=\'staking.Reward\' AND addData=? AND height<=? ORDER BY timestamp ASC',
+                                            FROM transactions WHERE event=\'staking.Rewarded\' AND addData=? AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
   return res;
 }
