@@ -328,8 +328,8 @@ function main() {
   const flagFeePaid = config.feePaid;
   const flagFeeReceived = config.feeReceived;
   const flagCreateTransfers = config.createTransfers || false;
-  const arrIgnoreTx: string[] = config.ignoreTx;
-  const arrIgnoreTxDW: string[] = config.ignoreTxDW;
+  const arrIgnoreTx: string[] = chainData.ignoreTx;
+  const arrIgnoreTxDW: string[] = chainData.ignoreTxDW;
   const formatStaking = config.csv.staking;
   const formatFeeReceived = config.csv.feeReceived;
   const formatFeePaid = config.csv.feePaid;
