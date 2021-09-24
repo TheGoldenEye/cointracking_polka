@@ -67,11 +67,11 @@
     }
   },
   "csv": {
-    "header": "\"Type\",\"Buy\",\"Cur.\",\"Sell\",\"Cur.\",\"Fee\",\"Cur.\",\"Exchange\",\"Group\",\"Comment\",\"Date\",\"TradeID\",\"BuyValue\",\"SellValue\"",
-    "staking": "\n\"Staking\",\"%s\",\"%s\",,,,,\"Wallet_%s\",\"%s\",\"stash: %s tx:%s\",\"%s\",\"Wallet_%s_%s\",,",
+    "header":      "\"Type\",\"Buy\",\"Cur.\",\"Sell\",\"Cur.\",\"Fee\",\"Cur.\",\"Exchange\",\"Group\",\"Comment\",\"Date\",\"TradeID\",\"BuyValue\",\"SellValue\"",
+    "staking":     "\n\"Staking\",\"%s\",\"%s\",,,,,\"Wallet_%s\",\"%s\",\"stash: %s tx:%s\",\"%s\",\"Wallet_%s_%s\",,",
     "feeReceived": "\n\"Staking\",\"%s\",\"%s\",,,,,\"Wallet_%s\",\"%s\",\"Fee received: tx:%s\",\"%s\",\"Wallet_%s_%s\",,",
-    "feePaid": "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Wallet_%s\",\"%s\",\"Fee paid: tx:%s\",\"%s\",\"Wallet_%s_%s\",\"0.00000001\",\"0.00000001\"",
-    "deposit": "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s\",\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_D\",,",
-    "withdrawal": "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\",\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_W\",,"
+    "feePaid":     "\n\"Other Fee\",,,\"%s\",\"%s\",\"%s\",\"%s\",\"Wallet_%s\",\"%s\",\"Fee paid: tx:%s\",\"%s\",\"Wallet_%s_%s\",,",
+    "deposit":     "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s\",\"%s\",\"tx:%s (%s) from %s\",\"%s\",\"Wallet_%s_%s_D\",,",
+    "withdrawal":  "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\",\"%s\",\"tx:%s (%s) to %s\",\"%s\",\"Wallet_%s_%s_W\",,"
   }
 }

@@ -42,6 +42,7 @@ type TFeePaidRecord = {
 type TDepositRecord = {
   name: string,
   id: string,
+  type: string,
   senderId: string,
   recipientId: string,
   amount: bigint,
@@ -53,6 +54,7 @@ type TDepositRecord = {
 type TWithdrawalRecord = {
   name: string,
   id: string,
+  type: string,
   senderId: string,
   recipientId: string,
   amount: bigint,
@@ -109,7 +111,7 @@ function GetFeeReceivedRecords(name: string, accountID: string, atBlock: bigint)
 
 // --------------------------------------------------------------
 function GetDepositRecords(name: string, accountID: string, atBlock: bigint): TDepositRecord[] {
-  const res: TDepositRecord[] = db().query('SELECT ? as name, id, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
+  const res: TDepositRecord[] = db().query('SELECT ? as name, id, type, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                              FROM transactions WHERE senderId IS NOT NULL AND recipientId=? AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
   return res;
@@ -117,7 +119,7 @@ function GetDepositRecords(name: string, accountID: string, atBlock: bigint): TD
 
 // --------------------------------------------------------------
 function GetWithdrawalRecords(name: string, accountID: string, atBlock: bigint): TWithdrawalRecord[] {
-  const res: TWithdrawalRecord[] = db().query('SELECT ? as name, id, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
+  const res: TWithdrawalRecord[] = db().query('SELECT ? as name, id, type, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
                                                 FROM transactions WHERE senderId=? AND recipientId IS NOT NULL AND height<=? ORDER BY timestamp ASC',
     name, accountID, atBlock);
   return res;
@@ -234,8 +236,8 @@ function OutputDeposits(progressOfs: number, progressCnt: number, file: string, 
     count++;
 
     const val = DivideS(e.amount, decimals);
-    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_D\"",
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, e.date, unit, e.id));
+    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s (%s) from %s\",\"%s\",\"Wallet_%s_%s_D\"",
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, e.type, e.senderId, e.date, unit, e.id));
   });
 
   return count;
@@ -260,8 +262,8 @@ function OutputWithdrawals(progressOfs: number, progressCnt: number, file: strin
     count++;
 
     const val = DivideS(e.amount, decimals);
-    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s\",\"%s\",\"Wallet_%s_%s_W\""
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, e.date, unit, e.id));
+    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s (%s) to %s\",\"%s\",\"Wallet_%s_%s_W\""
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, e.type, e.recipientId, e.date, unit, e.id));
   });
 
   return count;
