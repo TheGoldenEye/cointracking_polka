@@ -12,6 +12,13 @@
       "decimals": 10,
       "ignoreTx": [],
       "ignoreTxDW": [],
+      "accountNames": [
+        {
+          "name": "Account1",
+          "account": "15TyVXg2fGuuvhfjRETbDcZ2Byzr8cx8awzsP7c8urysovM6",
+          "comment": "example for a account with name Account1"
+        }
+      ],
       "accounts": [
         {
           "name": "Example1",
@@ -32,6 +39,13 @@
       "decimals": 12,
       "ignoreTx": [],
       "ignoreTxDW": [],
+      "accountNames": [
+        {
+          "name": "Account1",
+          "account": "H3J1WkqRrfNEpUfEJDdyR5sUxHSEzDAxq78cUtjqaArNgHT",
+          "comment": "example for a account with name Account1"
+        }
+      ],
       "accounts": [
         {
           "name": "Example1",
@@ -52,6 +66,13 @@
       "decimals": 12,
       "ignoreTx": [],
       "ignoreTxDW": [],
+      "accountNames": [
+        {
+          "name": "Account1",
+          "account": "5GXgMCQxoVeSVAfDTbQb5TisLN1CSKPzWTGPDpcnMmxMdSZH",
+          "comment": "example for a account with name Account1"
+        }
+      ],
       "accounts": [
         {
           "name": "Example1",

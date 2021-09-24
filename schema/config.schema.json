@@ -30,6 +30,7 @@
         "decimals",
         "ignoreTx",
         "ignoreTxDW",
+        "accountNames",
         "accounts"
       ],
       "properties": {
@@ -74,6 +75,13 @@
           "description": "Transactions to ignore (Deposit/Withdrawal only)",
           "items": {
             "type": "string"
+          }
+        },
+        "accountNames": {
+          "type": "array",
+          "description": "A named account.",
+          "items": {
+            "$ref": "#/definitions/NamedAccount"
           }
         },
         "accounts": {
