@@ -28,6 +28,8 @@
         "unit",
         "ticker",
         "decimals",
+        "ignoreTx",
+        "ignoreTxDW",
         "accounts"
       ],
       "properties": {
@@ -60,6 +62,20 @@
           "minimum": 10,
           "maximum": 12
         },
+        "ignoreTx": {
+          "type": "array",
+          "description": "Transactions to ignore (all types)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ignoreTxDW": {
+          "type": "array",
+          "description": "Transactions to ignore (Deposit/Withdrawal only)",
+          "items": {
+            "type": "string"
+          }
+        },
         "accounts": {
           "type": "array",
           "description": "A named account.",
@@ -76,8 +92,6 @@
     "feePaid",
     "createTransfers",
     "defchain",
-    "ignoreTx",
-    "ignoreTxDW",
     "chains"
   ],
   "properties": {
@@ -120,20 +134,6 @@
       "type": "string",
       "default": "Polkadot",
       "description": "The chain which is used (if no chain is given in the command line)."
-    },
-    "ignoreTx": {
-      "type": "array",
-      "description": "Transactions to ignore (all types)",
-      "items": {
-        "type": "string"
-      }
-    },
-    "ignoreTxDW": {
-      "type": "array",
-      "description": "Transactions to ignore (Deposit/Withdrawal only)",
-      "items": {
-        "type": "string"
-      }
     },
     "chains": {
       "type": "object",
