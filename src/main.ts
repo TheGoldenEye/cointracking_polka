@@ -236,8 +236,15 @@ function OutputDeposits(progressOfs: number, progressCnt: number, file: string, 
     count++;
 
     const val = DivideS(e.amount, decimals);
-    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s (%s) from %s\",\"%s\",\"Wallet_%s_%s_D\"",
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, e.type, e.senderId, e.date, unit, e.id));
+    const name = chainData.names[e.senderId];
+    const from = name || e.senderId;
+
+    if (!name && !chainData.namesNotFound.includes(from)) {
+      chainData.namesNotFound.push(from);
+    }
+
+    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s from %s\",\"%s\",\"Wallet_%s_%s_D\"",
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, from, e.date, unit, e.id));
   });
 
   return count;
@@ -262,8 +269,15 @@ function OutputWithdrawals(progressOfs: number, progressCnt: number, file: strin
     count++;
 
     const val = DivideS(e.amount, decimals);
-    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s (%s) to %s\",\"%s\",\"Wallet_%s_%s_W\""
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, e.type, e.recipientId, e.date, unit, e.id));
+    const name = chainData.names[e.recipientId];
+    const to = name || e.recipientId;
+
+    if (!name && !chainData.namesNotFound.includes(to)) {
+      chainData.namesNotFound.push(to);
+    }
+
+    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s to %s\",\"%s\",\"Wallet_%s_%s_W\""
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, to, e.date, unit, e.id));
   });
 
   return count;
@@ -325,6 +339,19 @@ function main() {
     console.log('Missing Data in Database, abort.');
     return;
   }
+
+  // Create mapping list of accounts with its names
+  chainData.names = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chainData.accountNames.forEach((value: any) => {
+    chainData.names[value.account] = value.name;
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chainData.accounts.forEach((value: any) => {
+    chainData.names[value.account] = value.name;
+  });
+
+  chainData.namesNotFound = [];
 
   const flagStaking = config.staking;
   const flagFeePaid = config.feePaid;
@@ -496,6 +523,15 @@ function main() {
   console.log(sprintf('FeePaid records:     %5d   Total: %s %s', feePaid.count, DivideS(-feePaid.value, chainData.decimals), unit));
   console.log(sprintf('Deposit records:     %5d', deposits));
   console.log(sprintf('Withdrawal records:  %5d', withdrawals));
+
+  if (chainData.namesNotFound.length) {
+    console.log('\nMissing accounts in accountNames list:');
+    chainData.namesNotFound.forEach((account: string) => {
+      console.log(account);
+    });
+  }
 }
+
+
 
 main();
