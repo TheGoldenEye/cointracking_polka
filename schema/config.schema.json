@@ -30,6 +30,8 @@
         "decimals",
         "ignoreTx",
         "ignoreTxDW",
+        "accountsStaking",
+        "accountsNotStaking",
         "accountNames",
         "accounts"
       ],
@@ -73,6 +75,20 @@
         "ignoreTxDW": {
           "type": "array",
           "description": "Transactions to ignore (Deposit/Withdrawal only)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accountsStaking": {
+          "type": "array",
+          "description": "Accounts should be marked with the 'STAKE' tag in the comment",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accountsNotStaking": {
+          "type": "array",
+          "description": "Accounts should be marked with the 'NOSTAKE' tag in the comment",
           "items": {
             "type": "string"
           }

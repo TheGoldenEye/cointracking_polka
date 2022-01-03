@@ -145,8 +145,13 @@ function OutputStaking(progressOfs: number, progressCnt: number, file: string, f
     count++;
 
     const val = DivideS(e.amount, decimals);
-    //"staking":  "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"stash: %s tx:%s\",\"%s\",\"Staking_%s_%s\"
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.stash, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    const arrStaking: string[] = chainData.accountsStaking;
+    const arrNotStaking: string[] = chainData.accountsNotStaking;
+    const comment_prefix = arrStaking.indexOf(e.recipientId) >= 0 ? 'STAKE '
+      : arrNotStaking.indexOf(e.recipientId) >= 0 ? 'NOSTAKE '
+        : '';
+    //"staking":  "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sstash: %s tx:%s\",\"%s\",\"Staking_%s_%s\"
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, comment_prefix, e.stash, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
@@ -176,8 +181,13 @@ function OutputFeeReceived(progressOfs: number, progressCnt: number, file: strin
     count++;
 
     const val = DivideS(e.feeReceived, decimals);
-    // "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"Fee received: tx:%s\",\"%s\",\"Staking_%s_%s\"",
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.authorId, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    const arrStaking: string[] = chainData.accountsStaking;
+    const arrNotStaking: string[] = chainData.accountsNotStaking;
+    const comment_prefix = arrStaking.indexOf(e.authorId) >= 0 ? 'STAKE '
+      : arrNotStaking.indexOf(e.authorId) >= 0 ? 'NOSTAKE '
+        : '';
+    // "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sFee received: tx:%s\",\"%s\",\"Staking_%s_%s\"",
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.authorId, comment_prefix, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
@@ -207,8 +217,13 @@ function OutputFeePaid(progressOfs: number, progressCnt: number, file: string, f
     count++;
 
     const val = DivideS(e.feePaid, decimals);
-    // "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Staking_%s\",\"%s\",\"Fee paid: tx:%s\",\"%s\",\"Staking_%s_%s\",\"0.00000001\",\"0.00000001\""
-    fs.appendFileSync(file, sprintf(format, val, ticker, val, ticker, unit, e.senderId, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    const arrStaking: string[] = chainData.accountsStaking;
+    const arrNotStaking: string[] = chainData.accountsNotStaking;
+    const comment_prefix = arrStaking.indexOf(e.senderId) >= 0 ? 'STAKE '
+      : arrNotStaking.indexOf(e.senderId) >= 0 ? 'NOSTAKE '
+        : '';
+    // "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Staking_%s\",\"%s\",\"%sFee paid: tx:%s\",\"%s\",\"Staking_%s_%s\",\"0.00000001\",\"0.00000001\""
+    fs.appendFileSync(file, sprintf(format, val, ticker, val, ticker, unit, e.senderId, comment_prefix, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
@@ -238,13 +253,18 @@ function OutputDeposits(progressOfs: number, progressCnt: number, file: string, 
     const val = DivideS(e.amount, decimals);
     const name = chainData.names[e.senderId];
     const from = name || e.senderId;
+    const arrStaking: string[] = chainData.accountsStaking;
+    const arrNotStaking: string[] = chainData.accountsNotStaking;
+    const comment_prefix = arrStaking.indexOf(e.recipientId) >= 0 ? 'STAKE '
+      : arrNotStaking.indexOf(e.recipientId) >= 0 ? 'NOSTAKE '
+        : '';
 
     if (!name && !chainData.namesNotFound.includes(from)) {
       chainData.namesNotFound.push(from);
     }
 
-    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"tx:%s from %s\",\"%s\",\"Wallet_%s_%s_D\"",
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, e.id, from, e.date, unit, e.id));
+    // "\n\"Deposit\",\"%s\",\"%s\",,,,,\"Wallet_%s \",\"%s\",\"%stx:%s from %s\",\"%s\",\"Wallet_%s_%s_D\"",
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, comment_prefix, e.id, from, e.date, unit, e.id));
   });
 
   return count;
@@ -271,13 +291,18 @@ function OutputWithdrawals(progressOfs: number, progressCnt: number, file: strin
     const val = DivideS(e.amount, decimals);
     const name = chainData.names[e.recipientId];
     const to = name || e.recipientId;
+    const arrStaking: string[] = chainData.accountsStaking;
+    const arrNotStaking: string[] = chainData.accountsNotStaking;
+    const comment_prefix = arrStaking.indexOf(e.senderId) >= 0 ? 'STAKE '
+      : arrNotStaking.indexOf(e.senderId) >= 0 ? 'NOSTAKE '
+        : '';
 
     if (!name && !chainData.namesNotFound.includes(to)) {
       chainData.namesNotFound.push(to);
     }
 
-    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"tx:%s to %s\",\"%s\",\"Wallet_%s_%s_W\""
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, e.id, to, e.date, unit, e.id));
+    // "\n\"Withdrawal\",,,\"%s\",\"%s\",,,\"Wallet_%s\" ,\"%s\",\"%stx:%s to %s\",\"%s\",\"Wallet_%s_%s_W\""
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.senderId, comment_prefix, e.id, to, e.date, unit, e.id));
   });
 
   return count;
