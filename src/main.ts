@@ -151,7 +151,7 @@ function OutputStaking(progressOfs: number, progressCnt: number, file: string, f
       : arrNotStaking.indexOf(e.recipientId) >= 0 ? 'NOSTAKE '
         : '';
     //"staking":  "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sstash: %s tx:%s\",\"%s\",\"Staking_%s_%s\"
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, comment_prefix, e.stash, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, comment_prefix, e.stash, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
@@ -187,7 +187,7 @@ function OutputFeeReceived(progressOfs: number, progressCnt: number, file: strin
       : arrNotStaking.indexOf(e.authorId) >= 0 ? 'NOSTAKE '
         : '';
     // "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sFee received: tx:%s\",\"%s\",\"Staking_%s_%s\"",
-    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.authorId, comment_prefix, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.authorId, comment_prefix, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
@@ -223,7 +223,7 @@ function OutputFeePaid(progressOfs: number, progressCnt: number, file: string, f
       : arrNotStaking.indexOf(e.senderId) >= 0 ? 'NOSTAKE '
         : '';
     // "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Staking_%s\",\"%s\",\"%sFee paid: tx:%s\",\"%s\",\"Staking_%s_%s\",\"0.00000001\",\"0.00000001\""
-    fs.appendFileSync(file, sprintf(format, val, ticker, val, ticker, unit, e.senderId, comment_prefix, e.id, daily ? e.date.substr(0, 11) + '23:59:59' : e.date, unit, e.id));
+    fs.appendFileSync(file, sprintf(format, val, ticker, val, ticker, unit, e.senderId, comment_prefix, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
 
   return {
