@@ -12,8 +12,8 @@
       "decimals": 10,
       "ignoreTx": [],
       "ignoreTxDW": [],
-      "accountsStaking": [],
-      "accountsNotStaking": [],
+      "accountsStaking": {},
+      "accountsNotStaking": {},
       "accountNames": [
         {
           "name": "Account1",
@@ -41,8 +41,8 @@
       "decimals": 12,
       "ignoreTx": [],
       "ignoreTxDW": [],
-      "accountsStaking": [],
-      "accountsNotStaking": [],
+      "accountsStaking": {},
+      "accountsNotStaking": {},
       "accountNames": [
         {
           "name": "Account1",
@@ -70,8 +70,8 @@
       "decimals": 12,
       "ignoreTx": [],
       "ignoreTxDW": [],
-      "accountsStaking": [],
-      "accountsNotStaking": [],
+      "accountsStaking": {},
+      "accountsNotStaking": {},
       "accountNames": [
         {
           "name": "Account1",

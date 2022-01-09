@@ -63,6 +63,12 @@ type TWithdrawalRecord = {
 }
 
 // --------------------------------------------------------------
+type TStakefromTo = {
+  from: string | null,
+  to: string | null
+}
+
+// --------------------------------------------------------------
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CreateCsv(fs: any, header: string, date: string, unit: string): string {
   const fileName = 'output/' + date + '_' + unit + '.csv';
@@ -127,6 +133,34 @@ function GetWithdrawalRecords(name: string, accountID: string, atBlock: bigint):
 
 // --------------------------------------------------------------
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function GetSpecialStakingAccount(chainData: any, account: string, date: string): string {
+  const d = new Date(date);
+  let e: TStakefromTo;
+  let d1 = new Date(1900, 0);   // 1900-01-01 default, if from is null
+  let d2 = new Date(3000, 0);   // 3000-01-01 default, if to is null
+  e = chainData.accountsStaking[account];
+  if (e) {
+    if (e.from)
+      d1 = new Date(e.from);
+    if (e.to)
+      d2 = new Date(e.to);
+    return (d1 <= d && d <= d2) ? 'STAKE ' : '';
+  }
+
+  e = chainData.accountsNotStaking[account];
+  if (e) {
+    if (e.from)
+      d1 = new Date(e.from);
+    if (e.to)
+      d2 = new Date(e.to);
+    return (d1 <= d && d <= d2) ? 'NOSTAKE ' : '';
+  }
+
+  return '';
+}
+
+// --------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function OutputStaking(progressOfs: number, progressCnt: number, file: string, format: string, daily: boolean, chainData: any, arr: TStakingRecord[]): { count: number, value: bigint } {
   const decimals = chainData.decimals;
   const unit = chainData.unit;
@@ -145,11 +179,8 @@ function OutputStaking(progressOfs: number, progressCnt: number, file: string, f
     count++;
 
     const val = DivideS(e.amount, decimals);
-    const arrStaking: string[] = chainData.accountsStaking;
-    const arrNotStaking: string[] = chainData.accountsNotStaking;
-    const comment_prefix = arrStaking.indexOf(e.recipientId) >= 0 ? 'STAKE '
-      : arrNotStaking.indexOf(e.recipientId) >= 0 ? 'NOSTAKE '
-        : '';
+    const comment_prefix = GetSpecialStakingAccount(chainData, e.recipientId, e.date);
+
     //"staking":  "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sstash: %s tx:%s\",\"%s\",\"Staking_%s_%s\"
     fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.recipientId, comment_prefix, e.stash, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
@@ -181,11 +212,8 @@ function OutputFeeReceived(progressOfs: number, progressCnt: number, file: strin
     count++;
 
     const val = DivideS(e.feeReceived, decimals);
-    const arrStaking: string[] = chainData.accountsStaking;
-    const arrNotStaking: string[] = chainData.accountsNotStaking;
-    const comment_prefix = arrStaking.indexOf(e.authorId) >= 0 ? 'STAKE '
-      : arrNotStaking.indexOf(e.authorId) >= 0 ? 'NOSTAKE '
-        : '';
+    const comment_prefix = GetSpecialStakingAccount(chainData, e.authorId, e.date);
+
     // "\n\"Staking\",\"%s\",\"%s\",,,,,\"Staking_%s\",\"%s\",\"%sFee received: tx:%s\",\"%s\",\"Staking_%s_%s\"",
     fs.appendFileSync(file, sprintf(format, val, ticker, unit, e.authorId, comment_prefix, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
@@ -217,11 +245,8 @@ function OutputFeePaid(progressOfs: number, progressCnt: number, file: string, f
     count++;
 
     const val = DivideS(e.feePaid, decimals);
-    const arrStaking: string[] = chainData.accountsStaking;
-    const arrNotStaking: string[] = chainData.accountsNotStaking;
-    const comment_prefix = arrStaking.indexOf(e.senderId) >= 0 ? 'STAKE '
-      : arrNotStaking.indexOf(e.senderId) >= 0 ? 'NOSTAKE '
-        : '';
+    const comment_prefix = GetSpecialStakingAccount(chainData, e.senderId, e.date);
+
     // "\n\"Trade\",\"0\",\"EUR\",\"%s\",\"%s\",\"%s\",\"%s\",\"Staking_%s\",\"%s\",\"%sFee paid: tx:%s\",\"%s\",\"Staking_%s_%s\",\"0.00000001\",\"0.00000001\""
     fs.appendFileSync(file, sprintf(format, val, ticker, val, ticker, unit, e.senderId, comment_prefix, e.id, daily ? e.date.substring(0, 11) + '23:59:59' : e.date, unit, e.id));
   });
@@ -253,11 +278,7 @@ function OutputDeposits(progressOfs: number, progressCnt: number, file: string, 
     const val = DivideS(e.amount, decimals);
     const name = chainData.names[e.senderId];
     const from = name || e.senderId;
-    const arrStaking: string[] = chainData.accountsStaking;
-    const arrNotStaking: string[] = chainData.accountsNotStaking;
-    const comment_prefix = arrStaking.indexOf(e.recipientId) >= 0 ? 'STAKE '
-      : arrNotStaking.indexOf(e.recipientId) >= 0 ? 'NOSTAKE '
-        : '';
+    const comment_prefix = GetSpecialStakingAccount(chainData, e.recipientId, e.date);
 
     if (!name && !chainData.namesNotFound.includes(from)) {
       chainData.namesNotFound.push(from);
@@ -291,11 +312,7 @@ function OutputWithdrawals(progressOfs: number, progressCnt: number, file: strin
     const val = DivideS(e.amount, decimals);
     const name = chainData.names[e.recipientId];
     const to = name || e.recipientId;
-    const arrStaking: string[] = chainData.accountsStaking;
-    const arrNotStaking: string[] = chainData.accountsNotStaking;
-    const comment_prefix = arrStaking.indexOf(e.senderId) >= 0 ? 'STAKE '
-      : arrNotStaking.indexOf(e.senderId) >= 0 ? 'NOSTAKE '
-        : '';
+    const comment_prefix = GetSpecialStakingAccount(chainData, e.senderId, e.date);
 
     if (!name && !chainData.namesNotFound.includes(to)) {
       chainData.namesNotFound.push(to);

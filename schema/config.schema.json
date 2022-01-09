@@ -80,18 +80,12 @@
           }
         },
         "accountsStaking": {
-          "type": "array",
-          "description": "Accounts should be marked with the 'STAKE' tag in the comment",
-          "items": {
-            "type": "string"
-          }
+          "type": "object",
+          "description": "Accounts should be marked with the 'STAKE' tag in the comment"
         },
         "accountsNotStaking": {
-          "type": "array",
-          "description": "Accounts should be marked with the 'NOSTAKE' tag in the comment",
-          "items": {
-            "type": "string"
-          }
+          "type": "object",
+          "description": "Accounts should be marked with the 'NOSTAKE' tag in the comment"
         },
         "accountNames": {
           "type": "array",
