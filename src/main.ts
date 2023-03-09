@@ -82,23 +82,23 @@ function CreateCsv(fs: any, header: string, date: string, unit: string): string 
 }
 
 // --------------------------------------------------------------
-function GetStakingRecords(name: string, accountID: string, atBlock: bigint): TStakingRecord[] {
+function GetStakingRecords(name: string, accountID: string, startHeight: bigint, atBlock: bigint): TStakingRecord[] {
   const res: TStakingRecord[] = db().query('SELECT ? as name, id, recipientId, addData AS stash, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                            FROM transactions WHERE event=\'staking.Rewarded\' AND addData=? AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                            FROM transactions WHERE event=\'staking.Rewarded\' AND addData=? AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
   return res;
 }
 
 // --------------------------------------------------------------
-function GetFeePaidRecords(name: string, accountID: string, atBlock: bigint): TFeePaidRecord[] {
+function GetFeePaidRecords(name: string, accountID: string, startHeight: bigint, atBlock: bigint): TFeePaidRecord[] {
   const res1: TFeePaidRecord[] = db().query('SELECT ? as name, id, senderId, totalFee AS feePaid, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                             FROM transactions WHERE totalFee IS NOT NULL AND senderId=? AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                             FROM transactions WHERE totalFee IS NOT NULL AND senderId=? AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
 
   // fees for identity jugement:
   const res2: TFeePaidRecord[] = db().query('SELECT ? as name, id, senderId, amount AS feePaid, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                             FROM transactions WHERE event LIKE \'balances.ReserveRepatriated%\' AND senderId=? AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                             FROM transactions WHERE event LIKE \'balances.ReserveRepatriated%\' AND senderId=? AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
 
   const res = res1.concat(res2);
 
@@ -108,26 +108,26 @@ function GetFeePaidRecords(name: string, accountID: string, atBlock: bigint): TF
 }
 
 // --------------------------------------------------------------
-function GetFeeReceivedRecords(name: string, accountID: string, atBlock: bigint): TFeeReceivedRecord[] {
+function GetFeeReceivedRecords(name: string, accountID: string, startHeight: bigint, atBlock: bigint): TFeeReceivedRecord[] {
   const res: TFeeReceivedRecord[] = db().query('SELECT ? as name, id, authorId, feeBalances AS feeReceived, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                                FROM transactions WHERE feeBalances IS NOT NULL AND authorId=? AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                                FROM transactions WHERE feeBalances IS NOT NULL AND authorId=? AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
   return res;
 }
 
 // --------------------------------------------------------------
-function GetDepositRecords(name: string, accountID: string, atBlock: bigint): TDepositRecord[] {
+function GetDepositRecords(name: string, accountID: string, startHeight: bigint, atBlock: bigint): TDepositRecord[] {
   const res: TDepositRecord[] = db().query('SELECT ? as name, id, type, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                             FROM transactions WHERE senderId IS NOT NULL AND recipientId=? AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                             FROM transactions WHERE senderId IS NOT NULL AND recipientId=? AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
   return res;
 }
 
 // --------------------------------------------------------------
-function GetWithdrawalRecords(name: string, accountID: string, atBlock: bigint): TWithdrawalRecord[] {
+function GetWithdrawalRecords(name: string, accountID: string, startHeight: bigint, atBlock: bigint): TWithdrawalRecord[] {
   const res: TWithdrawalRecord[] = db().query('SELECT ? as name, id, type, senderId, recipientId, amount, datetime(timestamp/1000, \'unixepoch\', \'localtime\') AS date \
-                                                FROM transactions WHERE senderId=? AND recipientId IS NOT NULL AND height<=? ORDER BY timestamp ASC',
-    name, accountID, atBlock);
+                                                FROM transactions WHERE senderId=? AND recipientId IS NOT NULL AND height>=? AND height<=? ORDER BY timestamp ASC',
+    name, accountID, startHeight, atBlock);
   return res;
 }
 
@@ -407,6 +407,7 @@ function main() {
   const formatDeposit = config.csv.deposit;
   const formatWithdrawal = config.csv.withdrawal;
   const unit = chainData.unit;
+  const startHeight: bigint = chainData.startHeight;
 
   if (flagStaking == 'day' || flagFeePaid == 'day' || flagFeeReceived == 'day') {
     // if aggregation by day, we need the last complete day
@@ -441,17 +442,17 @@ function main() {
     const name = chainData.accounts[i].name;
 
     if (flagStaking != 'none')
-      arrStaking = arrStaking.concat(GetStakingRecords(name, accountID, date.height));
+      arrStaking = arrStaking.concat(GetStakingRecords(name, accountID, startHeight, date.height));
 
     if (flagFeeReceived != 'none')
-      arrFeeReceived = arrFeeReceived.concat(GetFeeReceivedRecords(name, accountID, date.height));
+      arrFeeReceived = arrFeeReceived.concat(GetFeeReceivedRecords(name, accountID, startHeight, date.height));
 
     if (flagFeePaid != 'none')
-      arrFeePaid = arrFeePaid.concat(GetFeePaidRecords(name, accountID, date.height));
+      arrFeePaid = arrFeePaid.concat(GetFeePaidRecords(name, accountID, startHeight, date.height));
 
     if (flagCreateTransfers) {
-      arrDeposits = arrDeposits.concat(GetDepositRecords(name, accountID, date.height));
-      arrWithdrawals = arrWithdrawals.concat(GetWithdrawalRecords(name, accountID, date.height));
+      arrDeposits = arrDeposits.concat(GetDepositRecords(name, accountID, startHeight, date.height));
+      arrWithdrawals = arrWithdrawals.concat(GetWithdrawalRecords(name, accountID, startHeight, date.height));
     }
 
   }

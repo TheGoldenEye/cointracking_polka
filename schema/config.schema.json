@@ -28,6 +28,7 @@
         "unit",
         "ticker",
         "decimals",
+        "startHeight",
         "ignoreTx",
         "ignoreTxDW",
         "accountsStaking",
@@ -64,6 +65,11 @@
           "type": "integer",
           "minimum": 10,
           "maximum": 12
+        },
+        "startHeight": {
+          "description": "The height of first block number to scan.",
+          "type": "integer",
+          "minimum": 1
         },
         "ignoreTx": {
           "type": "array",
