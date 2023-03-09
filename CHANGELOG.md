@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.3.0 Mar 9, 2023
+
+Changes:
+
+- Possibility to define account lists for staking and not-staking
+
 ## 1.2.0 Dec 29, 2021
 
 Changes:
